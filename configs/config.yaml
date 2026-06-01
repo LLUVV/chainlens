@@ -1,0 +1,36 @@
+universe:
+  tw_top_n: 200              # TWSE top N by market cap
+  us_index: "sp500"          # sp500 | russell1000 | russell2000
+  min_market_cap_usd: 500e6  # filter illiquid names
+
+data:
+  price_start: "2015-01-01"
+  price_end: "2024-12-31"
+  filing_years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
+
+graph:
+  edge_tiers: [1, 2]         # which tiers to include (1=quantified, 2=named, 3=inferred)
+  min_edge_weight: 0.05      # drop edges below 5% revenue share (Tier 1 only)
+
+model:
+  type: "GAT"                # GAT | TGN
+  hidden_dim: 64
+  num_heads: 4
+  num_layers: 3
+  dropout: 0.2
+  alpha_stress: 0.3          # weight on stress loss vs return loss
+
+training:
+  train_end: "2020-12-31"
+  val_end: "2021-12-31"
+  test_start: "2022-01-01"
+  epochs: 100
+  lr: 0.001
+  batch_size: 32
+
+backtest:
+  rebalance: "quarterly"
+  long_quantile: 0.8         # top 20% by signal
+  short_quantile: 0.2        # bottom 20% by signal
+  tx_cost_us: 0.001          # 0.1%
+  tx_cost_tw: 0.003          # 0.3%
