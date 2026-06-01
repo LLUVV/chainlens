@@ -304,9 +304,9 @@ Risks 1 and 3 are go/no-go gates. Resolve them before building the full stack.
 
 ## Status
 
-- [ ] Phase 0: Universe construction
+- [x] Phase 0: Universe construction — 703 nodes (200 TW, 503 US), 7 ADR cross-references
 - [ ] Phase 1: Graph construction
 - [ ] Phase 2: Feature engineering
-- [ ] Phase 3: GNN training
+- [ ] Phase 3: GNN training — **gate: run static graph + linear model IC check first**
 - [ ] Phase 4: Signal construction
 - [ ] Phase 5: Backtest

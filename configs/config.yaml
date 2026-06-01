@@ -9,8 +9,10 @@ data:
   filing_years: [2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024]
 
 graph:
-  edge_tiers: [1, 2]         # which tiers to include (1=quantified, 2=named, 3=inferred)
+  edge_tiers: [1, 2]         # which tiers to include (1=quantified, 2=named, 3=inferred, 0=FactSet Revere)
   min_edge_weight: 0.05      # drop edges below 5% revenue share (Tier 1 only)
+  # Phase 1 gate: mean node degree must be >= 3 after build; if not, reassess before Phase 3
+  min_mean_degree: 3
 
 model:
   type: "GAT"                # GAT | TGN
@@ -18,12 +20,21 @@ model:
   num_heads: 4
   num_layers: 3
   dropout: 0.2
-  alpha_stress: 0.3          # weight on stress loss vs return loss
+  alpha_stress: 0.3          # weight on stress loss (Head 1) vs return loss (Head 2)
+  # Return head loss function: "ranking" (ListMLE) or "mse"
+  # Decision: ranking loss, per Feng et al. (2019) — optimizes stock ordering not point prediction
+  return_loss: "ranking"
 
 training:
-  train_end: "2020-12-31"
-  val_end: "2021-12-31"
-  test_start: "2022-01-01"
+  # Pre-COVID training window. COVID 2020-2021 treated as regime break — excluded from
+  # main training, evaluated separately. Post-COVID model trained on 2022+ with
+  # shorter expanding window.
+  train_end: "2019-12-31"
+  regime_break_start: "2020-01-01"
+  regime_break_end:   "2021-12-31"
+  val_start: "2022-01-01"
+  val_end:   "2022-12-31"
+  test_start: "2023-01-01"
   epochs: 100
   lr: 0.001
   batch_size: 32
@@ -32,5 +43,13 @@ backtest:
   rebalance: "quarterly"
   long_quantile: 0.8         # top 20% by signal
   short_quantile: 0.2        # bottom 20% by signal
-  tx_cost_us: 0.001          # 0.1%
-  tx_cost_tw: 0.003          # 0.3%
+  tx_cost_us: 0.001          # 0.1% one-way
+  tx_cost_tw: 0.003          # 0.3% one-way (securities transaction tax)
+  # Taiwan short leg may be infeasible (thin borrow market + 0.3% tax = 0.6% round-trip).
+  # tw_short: false runs TW as long-only; US leg runs long/short.
+  tw_short: false
+
+hypotheses:
+  # Test in priority order — each is a gate for the next (see HYPOTHESES.md)
+  # H1 + H3 must pass before building the GNN (Phase 3 gate)
+  priority: [H1, H3, H5, H2, H4, H6]
