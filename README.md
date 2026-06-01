@@ -244,6 +244,21 @@ Final signal = GNN embedding features + standard price factors (momentum, value,
 
 ---
 
+## Prior Art
+
+Key papers this project builds on. See `PRIOR_ART.md` for full detail and commercial data landscape.
+
+| Paper | Key Finding |
+|---|---|
+| Cohen & Frazzini (2008) | Customer earnings surprises predict supplier returns with delay — foundational evidence for H1 |
+| Menzly & Ozbas (2010) | Effect is stronger for less-covered firms — supports the Taiwan small-cap angle |
+| Ahern (2013) | Network centrality is priced in cross-section of returns — grounds the centrality delta signal |
+| Herskovic (2018) | Supply chain network structure affects systematic risk and expected returns — theoretical foundation |
+| Barrot & Sauvagnat (2016) | Supplier shocks propagate to customer sales — empirical support for the stress propagation mechanism |
+| Feng et al. (2019) | Ranking loss outperforms MSE for portfolio signal construction — informs loss function choice |
+
+---
+
 ## Folder Structure
 
 ```
@@ -268,6 +283,22 @@ chainlens/
 │   └── config.yaml        # universe params, model hyperparams
 └── tests/
 ```
+
+---
+
+## Risks
+
+Five risks that could kill the project. See `RISKS.md` for full detail.
+
+| # | Risk | When to Test |
+|---|---|---|
+| 1 | **Graph too sparse** — >10% revenue threshold leaves most nodes with 2–3 edges; GNN has nothing to aggregate | Immediately after Phase 1 |
+| 2 | **Look-ahead bias** — filing dates accidentally contaminate training graph with future information | Before any training run |
+| 3 | **No IC on simple version** — if static graph + linear model shows no IC, the GNN won't fix it | Before Phase 3 |
+| 4 | **Taiwan short-selling constraints** — thin borrow market + 0.3% transaction tax may make the short leg unexecutable | Before Phase 5 |
+| 5 | **Regime non-stationarity** — pre/post-2020 supply chain structure is materially different; model may not generalize | During Phase 5 validation |
+
+Risks 1 and 3 are go/no-go gates. Resolve them before building the full stack.
 
 ---
 

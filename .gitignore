@@ -12,6 +12,8 @@ env/
 data/raw/
 data/processed/
 data/graphs/
+# but keep directory structure markers
+!data/**/.gitkeep
 
 # Jupyter
 .ipynb_checkpoints/
